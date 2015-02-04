@@ -19,9 +19,17 @@ func main() {
 	var verbose, quiet bool
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.BoolVar(&quiet, "q", false, "Only print on failure")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [-q] [-v] package1 [package2 ...]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 	pkgs := flag.Args()
+	if len(pkgs) == 0 {
+		flag.Usage()
+		os.Exit(2)
+	}
 
 	c := loader.Config{SourceImports: true}
 	c.Import("database/sql")
