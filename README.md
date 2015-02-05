@@ -8,6 +8,8 @@ Usage
 -----
 
 ```
+$ go get github.com/stripe/safesql
+
 $ safesql
 Usage: safesql [-q] [-v] package1 [package2 ...]
   -q=false: Only print on failure
@@ -17,7 +19,7 @@ $ safesql example.com/an/unsafe/package
 Found 1 potentially unsafe SQL statements:
 - /Users/alice/go/src/example.com/an/unsafe/package/db.go:14:19
 Please ensure that all SQL queries you use are compile-time constants.
-You should always use parametrized queries or prepared statements
+You should always use parameterized queries or prepared statements
 instead of building queries from strings.
 
 $ safesql example.com/a/safe/package

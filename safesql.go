@@ -82,7 +82,7 @@ func main() {
 		fmt.Printf("- %s\n", pos)
 	}
 	fmt.Println("Please ensure that all SQL queries you use are compile-time constants.")
-	fmt.Println("You should always use parametrized queries or prepared statements")
+	fmt.Println("You should always use parameterized queries or prepared statements")
 	fmt.Println("instead of building queries from strings.")
 	os.Exit(1)
 }
