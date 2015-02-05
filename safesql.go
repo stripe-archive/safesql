@@ -53,8 +53,14 @@ func main() {
 		fmt.Println()
 	}
 
+	mains := FindMains(p, s)
+	if len(mains) == 0 {
+		fmt.Println("Did not find any commands (i.e., main functions).")
+		os.Exit(2)
+	}
+
 	res, err := pointer.Analyze(&pointer.Config{
-		Mains:          FindMains(p, s),
+		Mains:          mains,
 		BuildCallGraph: true,
 	})
 	if err != nil {
