@@ -31,7 +31,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	c := loader.Config{SourceImports: true}
+	c := loader.Config{}
 	c.Import("database/sql")
 	for _, pkg := range pkgs {
 		c.Import(pkg)
