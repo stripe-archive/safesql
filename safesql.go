@@ -12,6 +12,7 @@ import (
 	"golang.org/x/tools/go/loader"
 	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
+	"golang.org/x/tools/go/ssa/ssautil"
 	"golang.org/x/tools/go/types"
 )
 
@@ -41,10 +42,10 @@ func main() {
 		fmt.Printf("error loading packages %v: %v\n", pkgs, err)
 		os.Exit(2)
 	}
-	s := ssa.Create(p, 0)
+	s := ssautil.CreateProgram(p, 0)
 	s.BuildAll()
 
-	qms := FindQueryMethods(p.ImportMap["database/sql"], s)
+	qms := FindQueryMethods(p.Package("database/sql").Pkg, s)
 	if verbose {
 		fmt.Println("database/sql functions that accept queries:")
 		for _, m := range qms {
