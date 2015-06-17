@@ -130,7 +130,7 @@ func FindQueryMethods(sql *types.Package, ssa *ssa.Program) []*QueryMethod {
 	return methods
 }
 
-var stringType = types.New("string")
+var stringType types.Type = types.Typ[types.String]
 
 // FuncHasQuery returns the offset of the string parameter named "query", or
 // none if no such parameter exists.
