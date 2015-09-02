@@ -43,7 +43,7 @@ func main() {
 		os.Exit(2)
 	}
 	s := ssautil.CreateProgram(p, 0)
-	s.BuildAll()
+	s.Build()
 
 	qms := FindQueryMethods(p.Package("database/sql").Pkg, s)
 	if verbose {
