@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/stripe/safesql",
+	"GoVersion": "go1.5.2",
+	"Deps": [
+		{
+			"ImportPath": "golang.org/x/tools/container/intsets",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/ast/astutil",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/buildutil",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/callgraph",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/exact",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/loader",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/pointer",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/ssa",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		},
+		{
+			"ImportPath": "golang.org/x/tools/go/types",
+			"Rev": "fa833fdef560f0fe9b40dbb37fd03030ac3d514b"
+		}
+	]
+}
