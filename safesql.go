@@ -6,14 +6,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go/types"
 	"os"
 
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/callgraph"
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/loader"
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/pointer"
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/ssa"
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/ssa/ssautil"
-	"github.com/stripe/safesql/Godeps/_workspace/src/golang.org/x/tools/go/types"
+	"golang.org/x/tools/go/callgraph"
+	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/go/pointer"
+	"golang.org/x/tools/go/ssa"
+	"golang.org/x/tools/go/ssa/ssautil"
 )
 
 func main() {
