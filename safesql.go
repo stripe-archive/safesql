@@ -65,6 +65,11 @@ func main() {
 	}
 	p, err := c.Load()
 
+	if err != nil {
+		fmt.Printf("error loading packages %v: %v\n", pkgs, err)
+		os.Exit(2)
+	}
+
 	imports := getImports(p)
 	existOne := false
 	for i := range sqlPackages {
@@ -78,11 +83,6 @@ func main() {
 	}
 	if !existOne {
 		fmt.Printf("No packages in %v include a supported database driver", pkgs)
-		os.Exit(2)
-	}
-
-	if err != nil {
-		fmt.Printf("error loading packages %v: %v\n", pkgs, err)
 		os.Exit(2)
 	}
 
