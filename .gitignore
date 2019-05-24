@@ -1,0 +1,9 @@
+# Ignore bin folder
+bin/
+
+vendor/
+
+# Ignore IDEs
+.vscode/
+.idea/
+*.iml

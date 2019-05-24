@@ -39,6 +39,10 @@ var sqlPackages = []sqlPackage{
 		packageName: "github.com/jmoiron/sqlx",
 		paramNames:  []string{"query"},
 	},
+	{
+		packageName: "github.com/ido50/sqlz",
+		paramNames:  []string{"sql", "query"},
+	},
 }
 
 func main() {
@@ -86,7 +90,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	s := ssautil.CreateProgram(p, 0)
+	s := ssautil.CreateProgram(p, 0) // nolint
 	s.Build()
 
 	qms := make([]*QueryMethod, 0)
@@ -285,7 +289,7 @@ func FindNonConstCalls(cg *callgraph.Graph, qms []*QueryMethod) []ssa.CallInstru
 	return bad
 }
 
-// Deal with GO15VENDOREXPERIMENT
+// FindPackage - Deal with GO15VENDOREXPERIMENT
 func FindPackage(ctxt *build.Context, path, dir string, mode build.ImportMode) (*build.Package, error) {
 	if !useVendor {
 		return ctxt.Import(path, dir, mode)
@@ -295,7 +299,7 @@ func FindPackage(ctxt *build.Context, path, dir string, mode build.ImportMode) (
 	var vendorDir string
 	for tmp := dir; vendorDir == "" && tmp != "/"; tmp = filepath.Dir(tmp) {
 		dname := filepath.Join(tmp, "vendor", filepath.FromSlash(path))
-		fd, err := os.Open(dname)
+		fd, err := os.Open(filepath.Clean(dname))
 		if err != nil {
 			continue
 		}
