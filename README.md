@@ -72,7 +72,14 @@ constant, but this code has yet to be written.
 The second sort of false positive is based on a limitation in the sort of
 analysis SafeSQL performs: there are many safe SQL statements which are not
 feasible (or not possible) to represent as compile-time constants. More advanced
-static analysis techniques (such as taint analysis) or user-provided safety
-annotations would be able to reduce the number of false positives, but this is
-expected to be a significant undertaking.
+static analysis techniques (such as taint analysis).
+
+In order to ignore false positives, add the following comment to the line before
+or the same line as the statement:
+```
+//nolint:safesql
+```
+
+Even if a statement is ignored it will still be logged, but will not cause 
+safesql to exit with a status code of 1 if all found statements are ignored.
 
