@@ -4,12 +4,12 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"go/build"
 	"go/token"
 	"go/types"
+	"io/ioutil"
 	"os"
 	"sort"
 
@@ -23,7 +23,7 @@ import (
 	"golang.org/x/tools/go/ssa/ssautil"
 )
 
-const IgnoreComment = "nolint:safesql"
+const IgnoreComment = "//nolint:safesql"
 
 type sqlPackage struct {
 	packageName string
@@ -200,44 +200,33 @@ func CheckIssues(lines []token.Position) ([]Issue, error) {
 		// ensure we have the lines in ascending order
 		sort.Slice(linesInFile, func(i, j int) bool { return linesInFile[i].Line < linesInFile[j].Line })
 
-		f, err := os.Open(file)
+		data, err := ioutil.ReadFile(file)
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
-		s := bufio.NewScanner(f)
+		fileLines := strings.Split(string(data), "\n")
 
-		currentLine := 0
 		for _, line := range linesInFile {
 			// check the line before the problematic statement first
-			potentialCommentLine := line.Line - 1
+			potentialCommentLine := line.Line - 2
 
-			// if there are 2 statements back to back that are ignored then we don't want to check the previous so skip
-			// ie
-			// db.Query(query, args) //IsSqlSafe
-			// db.Query(query2, args2)
-			if currentLine != potentialCommentLine {
-				for ; currentLine < potentialCommentLine; currentLine++ {
-					if !s.Scan() {
-						return nil, s.Err()
-					}
-				}
-				if HasIgnoreComment(s.Text()) {
-					issues = append(issues, Issue{statement: line, ignored: true})
-					continue
-				}
+			// check only if the previous line is strictly a line that begins with
+			// the ignore comment
+			if 0 <= potentialCommentLine && BeginsWithComment(fileLines[potentialCommentLine]) {
+				issues = append(issues, Issue{statement: line, ignored: true})
+				continue
 			}
 
-			// check the line of the statement
-			if !s.Scan() {
-				return nil, s.Err()
-			}
-			isIgnored := HasIgnoreComment(s.Text())
+			isIgnored := HasIgnoreComment(fileLines[line.Line-1])
 			issues = append(issues, Issue{statement: line, ignored: isIgnored})
 		}
 	}
 
 	return issues, nil
+}
+
+func BeginsWithComment(line string) bool {
+	return strings.HasPrefix(strings.TrimSpace(line), IgnoreComment)
 }
 
 func HasIgnoreComment(line string) bool {
