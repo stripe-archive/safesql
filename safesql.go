@@ -7,8 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"go/build"
+	"go/token"
 	"go/types"
+	"io/ioutil"
 	"os"
+	"sort"
 
 	"path/filepath"
 	"strings"
@@ -19,6 +22,8 @@ import (
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
 )
+
+const IgnoreComment = "//nolint:safesql"
 
 type sqlPackage struct {
 	packageName string
@@ -133,16 +138,37 @@ func main() {
 		fmt.Printf("Found %d potentially unsafe SQL statements:\n", len(bad))
 	}
 
+	potentialBadStatements := []token.Position{}
 	for _, ci := range bad {
-		pos := p.Fset.Position(ci.Pos())
-		fmt.Printf("- %s\n", pos)
+		potentialBadStatements = append(potentialBadStatements, p.Fset.Position(ci.Pos()))
 	}
+
+	issues, err := CheckIssues(potentialBadStatements)
+	if err != nil {
+		fmt.Printf("error when checking for ignore comments: %v\n", err)
+		os.Exit(2)
+	}
+
 	if verbose {
 		fmt.Println("Please ensure that all SQL queries you use are compile-time constants.")
 		fmt.Println("You should always use parameterized queries or prepared statements")
 		fmt.Println("instead of building queries from strings.")
 	}
-	os.Exit(1)
+
+	hasNonIgnoredUnsafeStatement := false
+
+	for _, issue := range issues {
+		if issue.ignored {
+			fmt.Printf("- %s is potentially unsafe but ignored by comment\n", issue.statement)
+		} else {
+			fmt.Printf("- %s\n", issue.statement)
+			hasNonIgnoredUnsafeStatement = true
+		}
+	}
+
+	if hasNonIgnoredUnsafeStatement {
+		os.Exit(1)
+	}
 }
 
 // QueryMethod represents a method on a type which has a string parameter named
@@ -152,6 +178,59 @@ type QueryMethod struct {
 	SSA      *ssa.Function
 	ArgCount int
 	Param    int
+}
+
+type Issue struct {
+	statement token.Position
+	ignored   bool
+}
+
+// CheckIssues checks lines to see if the line before or the current line has an ignore comment and marks those
+// statements that have the ignore comment on the current line or the line before
+func CheckIssues(lines []token.Position) ([]Issue, error) {
+	files := make(map[string][]token.Position)
+
+	for _, line := range lines {
+		files[line.Filename] = append(files[line.Filename], line)
+	}
+
+	issues := []Issue{}
+
+	for file, linesInFile := range files {
+		// ensure we have the lines in ascending order
+		sort.Slice(linesInFile, func(i, j int) bool { return linesInFile[i].Line < linesInFile[j].Line })
+
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+		fileLines := strings.Split(string(data), "\n")
+
+		for _, line := range linesInFile {
+			// check the line before the problematic statement first
+			potentialCommentLine := line.Line - 2
+
+			// check only if the previous line is strictly a line that begins with
+			// the ignore comment
+			if 0 <= potentialCommentLine && BeginsWithComment(fileLines[potentialCommentLine]) {
+				issues = append(issues, Issue{statement: line, ignored: true})
+				continue
+			}
+
+			isIgnored := HasIgnoreComment(fileLines[line.Line-1])
+			issues = append(issues, Issue{statement: line, ignored: isIgnored})
+		}
+	}
+
+	return issues, nil
+}
+
+func BeginsWithComment(line string) bool {
+	return strings.HasPrefix(strings.TrimSpace(line), IgnoreComment)
+}
+
+func HasIgnoreComment(line string) bool {
+	return strings.HasSuffix(strings.TrimSpace(line), IgnoreComment)
 }
 
 // FindQueryMethods locates all methods in the given package (assumed to be
