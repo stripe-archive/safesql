@@ -83,3 +83,10 @@ or the same line as the statement:
 Even if a statement is ignored it will still be logged, but will not cause 
 safesql to exit with a status code of 1 if all found statements are ignored.
 
+Adding tests
+---------------
+To add a test create a new director in `testdata` and add a go program in the 
+folder you created, for an example look at `testdata/multiple_files`.
+
+After adding a new directory and go program, add an entry to the tests map in 
+`safesql_test.go`, which will run the tests against the program added.
